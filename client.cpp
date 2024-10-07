@@ -8,7 +8,7 @@
 
 #ifdef _WIN32
 #include <Ws2tcpip.h>
-#include <winsock2.h>
+#include <winsock.h>
 #else
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -32,6 +32,7 @@ bool write_messages = true;
 // Tries to connect to server at port 8555
 bool try_connect(std::string ip) {
     // Create a socket
+    std::cout<<"Connecting to "<<ip<<"...\n";
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     // Connect to the server
@@ -39,6 +40,7 @@ bool try_connect(std::string ip) {
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(DEFAULT_PORT);
     inet_pton(AF_INET, ip.c_str(), &server_addr.sin_addr);
+
 
     if(connect(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
         std::cout<<"Could not connect to "<<ip<<"\n";
@@ -59,18 +61,6 @@ void close_connection() {
 #endif
         server_socket = -1;
     }
-}
-
-char *serialize_message(const message &msg) {
-    char *buffer = new char[sizeof(msg)];
-    memcpy(buffer, &msg, sizeof(msg));
-    return buffer;
-}
-
-message deserialize_message(char *buffer) {
-    message msg;
-    memcpy(&msg, buffer, sizeof(msg));
-    return msg;
 }
 
 void send_message(const message &msg) {
@@ -119,25 +109,6 @@ message read_message() {
         std::cerr << "Error during recv: " << strerror(errno) << "\n";
 #endif
         return QUIT_MESSAGE;
-    }
-}
-
-void read_loop() {
-    int timeout_ms = 50;
-    while(read_messages) {
-        message msg = read_message();
-
-        if(msg.message_type == QUIT) {
-            write_messages = false;
-            read_messages = false;
-            close_connection();
-            break;
-        }
-        if(msg.message_type == CURRENT_PARAMETERS) {
-            handle_current_parameters(msg);
-        }
-        // Read in 20 hz
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     }
 }
 
@@ -462,6 +433,25 @@ void handle_current_parameters(message &msg) {
             break;
     }
     printf("--------------------\n\n");
+}
+
+void read_loop() {
+    int timeout_ms = 50;
+    while(read_messages) {
+        message msg = read_message();
+
+        if(msg.message_type == QUIT) {
+            write_messages = false;
+            read_messages = false;
+            close_connection();
+            break;
+        }
+        if(msg.message_type == CURRENT_PARAMETERS) {
+            handle_current_parameters(msg);
+        }
+        // Read in 20 hz
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
+    }
 }
 
 void write_loop() {
