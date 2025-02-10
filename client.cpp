@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <mutex>
+#include <unistd.h>
 
 #ifdef _WIN32
 #include <Ws2tcpip.h>
@@ -364,15 +365,17 @@ void handle_current_parameters(message &msg) {
                 \tCamera ID: %u\n\
                 \tX: %f\n\
                 \tY: %f\n\
-                \tRelative frame: %s\n\
-                \tYaw: %f\n\
-                \tPitch: %f\n",
+                \tAbsolute Yaw: %f\n\
+                \tAbsolute Pitch: %f\n\
+                \tRelative Yaw: %f\n\
+                \tRelative Pitch: %f\n",
                 (uint16_t)params.cam_id,
                 params.x,
                 params.y,
-                params.frame_rel ? "camera" : "global",
-                params.yaw,
-                params.pitch
+                params.yaw_abs,
+                params.pitch_abs,
+                params.yaw_rel,
+                params.pitch_rel
             );
             break;
         }
@@ -418,8 +421,8 @@ void handle_current_parameters(message &msg) {
                 "Camera sensor\n\
                 \tAE: %u\n\
                 \tTarget brightness: %u\n\
-                \tExposure value: %lu\n\
-                \tGain value: %lu\n",
+                \tExposure value: %u\n\
+                \tGain value: %u\n",
                 (uint16_t)params.ae,
                 (uint16_t)params.target_brightness,
                 params.exposure_value,
@@ -512,7 +515,7 @@ int main(int argc, char *argv[]) {
        2. Get all visible on screen
        3. Get all
        For this example we read all (option 3) */
-    
+
     //pack_get_detected_roi(msg, 0);
     //pack_get_detected_roi_visible(msg);
     pack_get_detected_roi_all(msg);
@@ -535,7 +538,7 @@ int main(int argc, char *argv[]) {
     messages_to_send.push_back(msg);
 
     // Top left corner of the screen
-    pack_get_cam_offset_parameters(msg, 0, -1.f, -1.f, 0);
+    pack_get_cam_offset_parameters(msg, 0, -1.f, -1.f);
     messages_to_send.push_back(msg);
 
     pack_get_parameters(msg, CAM_FOV, 0);
@@ -552,6 +555,5 @@ int main(int argc, char *argv[]) {
 
     read_thread.join();
     write_thread.join();
-
     return 0;
 }

@@ -18,6 +18,8 @@ target_include_directories(synclair-client-example PUBLIC
 
 if(WIN32)
   target_link_libraries(synclair-client-example wsock32 ws2_32)
+else()
+  target_link_libraries(synclair-client-example pthread)
 endif()
 
 # Install the executable
