@@ -572,6 +572,20 @@ int main(int argc, char *argv[]) {
     pack_get_parameters(msg, CAM_SENSOR);
     messages_to_send.push_back(msg);
 
+
+    // Anropa de nya funktionerna för att skicka meddelanden
+    pack_get_battery_status(msg);
+    messages_to_send.push_back(msg);
+
+    pack_start_video_recording(msg);
+    messages_to_send.push_back(msg);
+
+    pack_stop_video_recording(msg);
+    messages_to_send.push_back(msg);
+
+    pack_take_photo(msg);
+    messages_to_send.push_back
+
     mtx.unlock();
 
     read_thread.join();
