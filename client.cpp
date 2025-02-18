@@ -18,6 +18,27 @@
 
 #include "message-definitions/msg_defs.hpp"
 
+// Implementering av de nya funktionerna
+void pack_get_battery_status(message &msg) {
+    msg.message_type = BATTERY_STATUS;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
+void pack_start_video_recording(message &msg) {
+    msg.message_type = START_VIDEO_RECORDING;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
+void pack_stop_video_recording(message &msg) {
+    msg.message_type = STOP_VIDEO_RECORDING;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
+void pack_take_photo(message &msg) {
+    msg.message_type = TAKE_PHOTO;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
 static constexpr unsigned int DEFAULT_PORT = 8555;
 static constexpr message EMPTY_MESSAGE = {0, VERSION, EMPTY, 0, {0}};
 static constexpr message QUIT_MESSAGE  = {0, VERSION, QUIT,  0, {0}};
