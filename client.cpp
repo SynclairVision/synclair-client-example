@@ -18,6 +18,27 @@
 
 #include "message-definitions/msg_defs.hpp"
 
+// Implementering av de nya funktionerna
+void pack_get_battery_status(message &msg) {
+    msg.message_type = BATTERY_STATUS;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
+void pack_start_video_recording(message &msg) {
+    msg.message_type = START_VIDEO_RECORDING;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
+void pack_stop_video_recording(message &msg) {
+    msg.message_type = STOP_VIDEO_RECORDING;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
+void pack_take_photo(message &msg) {
+    msg.message_type = TAKE_PHOTO;
+    // Lägg till ytterligare logik om nödvändigt
+}
+
 static constexpr unsigned int DEFAULT_PORT = 8555;
 static constexpr message EMPTY_MESSAGE = {0, VERSION, EMPTY, 0, {0}};
 static constexpr message QUIT_MESSAGE  = {0, VERSION, QUIT,  0, {0}};
@@ -452,10 +473,50 @@ void read_loop() {
         if(msg.message_type == CURRENT_PARAMETERS) {
             handle_current_parameters(msg);
         }
-        // Read in 20 hz
+        switch (msg.message_type) {
+            case SYSTEM_STATUS:
+                handle_system_status(msg);
+                break;
+            case BATTERY_STATUS:
+                handle_battery_status(msg);
+                break;
+            case START_VIDEO_RECORDING:
+                handle_start_video_recording(msg);
+                break;
+            case STOP_VIDEO_RECORDING:
+                handle_stop_video_recording(msg);
+                break;
+            case TAKE_PHOTO:
+                handle_take_photo(msg);
+                break;
+            default:
+                std::cerr << "Unknown message type: " << msg.message_type << std::endl;
+                break;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     }
 }
+
+void handle_battery_status(const message &msg) {
+    std::cout << "Battery Status received" << std::endl;
+    // Extrahera och bearbeta batteristatusdata från msg
+}
+
+void handle_start_video_recording(const message &msg) {
+    std::cout << "Video Recording Started" << std::endl;
+    // Bekräftelse på att videoinspelning har startat
+}
+
+void handle_stop_video_recording(const message &msg) {
+    std::cout << "Video Recording Stopped" << std::endl;
+    // Bekräftelse på att videoinspelning har stoppats
+}
+
+void handle_take_photo(const message &msg) {
+    std::cout << "Photo Taken" << std::endl;
+    // Bekräftelse på att foto har tagits
+}
+
 
 void write_loop() {
     int timeout_ms = 50;
@@ -550,6 +611,20 @@ int main(int argc, char *argv[]) {
     // Back to messages non camera specific
     pack_get_parameters(msg, CAM_SENSOR);
     messages_to_send.push_back(msg);
+
+
+    // Anropa de nya funktionerna för att skicka meddelanden
+    pack_get_battery_status(msg);
+    messages_to_send.push_back(msg);
+
+    pack_start_video_recording(msg);
+    messages_to_send.push_back(msg);
+
+    pack_stop_video_recording(msg);
+    messages_to_send.push_back(msg);
+
+    pack_take_photo(msg);
+    messages_to_send.push_back
 
     mtx.unlock();
 
