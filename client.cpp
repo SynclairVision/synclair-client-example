@@ -473,10 +473,50 @@ void read_loop() {
         if(msg.message_type == CURRENT_PARAMETERS) {
             handle_current_parameters(msg);
         }
-        // Read in 20 hz
+        switch (msg.message_type) {
+            case SYSTEM_STATUS:
+                handle_system_status(msg);
+                break;
+            case BATTERY_STATUS:
+                handle_battery_status(msg);
+                break;
+            case START_VIDEO_RECORDING:
+                handle_start_video_recording(msg);
+                break;
+            case STOP_VIDEO_RECORDING:
+                handle_stop_video_recording(msg);
+                break;
+            case TAKE_PHOTO:
+                handle_take_photo(msg);
+                break;
+            default:
+                std::cerr << "Unknown message type: " << msg.message_type << std::endl;
+                break;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     }
 }
+
+void handle_battery_status(const message &msg) {
+    std::cout << "Battery Status received" << std::endl;
+    // Extrahera och bearbeta batteristatusdata från msg
+}
+
+void handle_start_video_recording(const message &msg) {
+    std::cout << "Video Recording Started" << std::endl;
+    // Bekräftelse på att videoinspelning har startat
+}
+
+void handle_stop_video_recording(const message &msg) {
+    std::cout << "Video Recording Stopped" << std::endl;
+    // Bekräftelse på att videoinspelning har stoppats
+}
+
+void handle_take_photo(const message &msg) {
+    std::cout << "Photo Taken" << std::endl;
+    // Bekräftelse på att foto har tagits
+}
+
 
 void write_loop() {
     int timeout_ms = 50;
