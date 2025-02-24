@@ -1,0 +1,13 @@
+nano ~/synclair-client-example/Automation/test_results/benchmark_results.txt
+nano ~/synclair-client-example/Automation/test_results/test_results.txt
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from SystemTest
+[ RUN      ] SystemTest.APICallTest
+{"body":"quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto","id":1,"title":"sunt aut facere repellat provident occaecati excepturi optio reprehenderit","userId":1}
+[       OK ] SystemTest.APICallTest (79 ms)
+[----------] 1 test from SystemTest (79 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (79 ms total)
+[  PASSED  ] 1 test.
