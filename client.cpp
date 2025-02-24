@@ -1,3 +1,5 @@
+#include "message-definitions/msg_defs.hpp"
+#include "message-definitions/message.hpp"
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -16,7 +18,19 @@
 #include <arpa/inet.h>
 #endif
 
-#include "message-definitions/msg_defs.hpp"
+// Definiera konstanterna endast om de inte redan är definierade
+// Dessa konstanter är redan definierade i "message.hpp"
+static constexpr message EMPTY_MESSAGE = {0, VERSION, EMPTY, 0, {0}};
+static constexpr message QUIT_MESSAGE = {0, VERSION, QUIT, 0, {0}};
+
+int server_socket = -1;
+
+std::vector<message> messages_to_send;
+std::mutex mtx;
+
+bool read_messages = true;
+bool write_messages = true;
+
 
 // Implementering av de nya funktionerna
 void pack_get_battery_status(message &msg) {
@@ -39,10 +53,8 @@ void pack_take_photo(message &msg) {
     // Lägg till ytterligare logik om nödvändigt
 }
 
-static constexpr unsigned int DEFAULT_PORT = 8555;
-static constexpr message EMPTY_MESSAGE = {0, VERSION, EMPTY, 0, {0}};
-static constexpr message QUIT_MESSAGE  = {0, VERSION, QUIT,  0, {0}};
 
+    
 int server_socket = -1;
 
 std::vector<message> messages_to_send;
@@ -497,26 +509,25 @@ void read_loop() {
     }
 }
 
+void handle_system_status(const message &msg) {
+    std::cout << "System Status received" << std::endl;
+}
+
 void handle_battery_status(const message &msg) {
     std::cout << "Battery Status received" << std::endl;
-    // Extrahera och bearbeta batteristatusdata från msg
 }
 
 void handle_start_video_recording(const message &msg) {
     std::cout << "Video Recording Started" << std::endl;
-    // Bekräftelse på att videoinspelning har startat
 }
 
 void handle_stop_video_recording(const message &msg) {
     std::cout << "Video Recording Stopped" << std::endl;
-    // Bekräftelse på att videoinspelning har stoppats
 }
 
 void handle_take_photo(const message &msg) {
     std::cout << "Photo Taken" << std::endl;
-    // Bekräftelse på att foto har tagits
 }
-
 
 void write_loop() {
     int timeout_ms = 50;
@@ -553,7 +564,7 @@ int main(int argc, char *argv[]) {
     std::thread read_thread(read_loop);
     std::thread write_thread(write_loop);
 
-    // Send GET for one of each message
+    // Skicka GET för varje meddelande
     mtx.lock();
     message msg;
     pack_get_parameters(msg, SYSTEM_STATUS);
@@ -571,18 +582,9 @@ int main(int argc, char *argv[]) {
     pack_get_parameters(msg, DETECTION);
     messages_to_send.push_back(msg);
 
-    /* This message comes in three forms:
-       1. Specify index
-       2. Get all visible on screen
-       3. Get all
-       For this example we read all (option 3) */
-
-    //pack_get_detected_roi(msg, 0);
-    //pack_get_detected_roi_visible(msg);
     pack_get_detected_roi_all(msg);
     messages_to_send.push_back(msg);
 
-    // For these messages we need to specify the camera index
     pack_get_parameters(msg, CAM_EULER, 0);
     messages_to_send.push_back(msg);
 
@@ -598,7 +600,6 @@ int main(int argc, char *argv[]) {
     pack_get_parameters(msg, CAM_CROP_MODE, 0);
     messages_to_send.push_back(msg);
 
-    // Top left corner of the screen
     pack_get_cam_offset_parameters(msg, 0, -1.f, -1.f);
     messages_to_send.push_back(msg);
 
@@ -608,12 +609,10 @@ int main(int argc, char *argv[]) {
     pack_get_parameters(msg, CAM_TARGET, 0);
     messages_to_send.push_back(msg);
 
-    // Back to messages non camera specific
     pack_get_parameters(msg, CAM_SENSOR);
     messages_to_send.push_back(msg);
 
-
-    // Anropa de nya funktionerna för att skicka meddelanden
+    // Nya funktioner
     pack_get_battery_status(msg);
     messages_to_send.push_back(msg);
 
@@ -624,7 +623,7 @@ int main(int argc, char *argv[]) {
     messages_to_send.push_back(msg);
 
     pack_take_photo(msg);
-    messages_to_send.push_back
+    messages_to_send.push_back(msg);
 
     mtx.unlock();
 
@@ -632,3 +631,4 @@ int main(int argc, char *argv[]) {
     write_thread.join();
     return 0;
 }
+ 

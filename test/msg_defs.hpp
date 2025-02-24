@@ -1,0 +1,17 @@
+#pragma once
+
+#ifndef MSG_DEFS_HPP
+#define MSG_DEFS_HPP
+
+#include "message.hpp"
+
+// Enum för meddelandetyper
+enum MessageType {
+    SYSTEM_STATUS,
+    // Lägg till fler typer här...
+};
+
+// Funktioner för packning och unpackning
+void pack_get_parameters(message &msg, MessageType type, uint16_t cam_id = 0);
+
+#endif // MSG_DEFS_HPP
