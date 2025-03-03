@@ -23,9 +23,8 @@
 static constexpr message EMPTY_MESSAGE = {0, VERSION, EMPTY, 0, {0}};
 static constexpr message QUIT_MESSAGE = {0, VERSION, QUIT, 0, {0}};
 
-int server_socket = -1;
 
-std::vector<message> messages_to_send;
+
 std::mutex mtx;
 
 bool read_messages = true;
@@ -57,8 +56,6 @@ void pack_take_photo(message &msg) {
     
 int server_socket = -1;
 
-std::vector<message> messages_to_send;
-std::mutex mtx;
 
 bool read_messages = true;
 bool write_messages = true;
